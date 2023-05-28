@@ -1,3 +1,5 @@
+[![Tests](https://github.com/akhomy/feeds_ex_xml_mapping/actions/workflows/testing.yml/badge.svg?branch=1.0.x)](https://github.com/akhomy/feeds_ex_xml_mapping/actions/workflows/testing.yml)
+
 # Feeds Extensible Parsers XML Mapping
 
 Extends XML parser with a mapping override per feed entity.
