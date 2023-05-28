@@ -28,7 +28,7 @@ class XmlMappingHelper {
 
     $mappings = $sources = [];
     $feed_type_mappings = $feed_type->getMappings();
-    $feed_type_sources = $parser_configuration['sources'];
+    $feed_type_sources = $parser_configuration['sources'] ?? [];
     foreach ($feed_type_mappings as $feed_type_mapping) {
       $mapping = $feed_type_mapping;
       // Adjust xpath field mappings.

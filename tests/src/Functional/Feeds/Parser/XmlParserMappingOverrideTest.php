@@ -24,7 +24,7 @@ class XmlParserMappingOverrideTest extends ParserTestBase {
    * It is declared this way in the parent modules. Let's replace it later
    * with protected.
    */
-  public static $modules = [
+  protected static $modules = [
     'feeds',
     'feeds_ex',
     'feeds_ex_xml_mapping',
@@ -37,6 +37,11 @@ class XmlParserMappingOverrideTest extends ParserTestBase {
    * {@inheritdoc}
    */
   protected $parserId = 'xml';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $customSourceType = 'xml';
 
   /**
    * {@inheritdoc}
@@ -63,6 +68,43 @@ class XmlParserMappingOverrideTest extends ParserTestBase {
    */
   protected function resourcesUrl(): string {
     return \Drupal::request()->getSchemeAndHttpHost() . '/' . \Drupal::service('extension.list.module')->getPath('feeds_ex_xml_mapping') . '/tests/resources';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function testMapping() {
+    $expected_sources = [
+      'name' => [
+        'label' => 'Name',
+        'value' => 'name',
+        'machine_name' => 'name',
+        'type' => $this->customSourceType,
+        'raw' => FALSE,
+        'inner' => FALSE,
+      ],
+    ];
+    $custom_source = [
+      'label' => 'Name',
+      'value' => 'name',
+      'machine_name' => 'name',
+    ];
+
+    $this->setupContext();
+    $this->doMappingTest($expected_sources, $custom_source);
+
+    // Assert that custom sources are displayed.
+    $this->drupalGet('admin/structure/feeds/manage/' . $this->feedType->id() . '/sources');
+    $session = $this->assertSession();
+    $session->pageTextContains('Custom XML Xpath sources');
+    $session->pageTextContains('Name');
+    $session->pageTextContains('Raw value');
+    $session->pageTextContains('Inner XML');
+    // Both options are disabled.
+    $session->pageTextNotContains('Enabled');
+    $session->pageTextContains('Disabled');
+    $session->linkByHrefExists('/admin/structure/feeds/manage/' . $this->feedType->id() . '/sources/name');
+    $session->linkByHrefExists('/admin/structure/feeds/manage/' . $this->feedType->id() . '/sources/name/delete');
   }
 
   /**
