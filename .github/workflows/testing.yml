@@ -1,9 +1,9 @@
 name: Tests
 on:
   push:
-    branches: [ 3.0.x ]
+    branches: [ 1.0.x ]
   pull_request:
-    branches: [ 3.0.x ]
+    branches: [ 1.0.x ]
 jobs:
   drupal:
     name: Drupal ${{ matrix.drupal-core }} (PHP ${{ matrix.php-versions }})
@@ -112,7 +112,7 @@ jobs:
       - name: Install feeds_ex_xml_mapping module
         run: |
           composer config repositories.feeds_ex_xml_mapping vcs https://github.com/akhomy/feeds_ex_xml_mapping
-          composer require drupal/feeds_ex_xml_mapping:3.0.x-dev
+          composer require drupal/feeds_ex_xml_mapping:1.0.x-dev
 
       - name: Run PHPUnit
         run: |
