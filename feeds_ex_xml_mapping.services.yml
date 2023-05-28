@@ -1,0 +1,5 @@
+services:
+  feeds_ex_xml_mapping.update_mappings.subscriber:
+    class: Drupal\feeds_ex_xml_mapping\EventSubscriber\UpdateMappingsSubscriber
+    tags:
+      - { name: event_subscriber }

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<elements>
+  <element>
+    <id>1</id>
+    <label>Lorem ipsum</label>
+    <text>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.</text>
+    <alpha>Lorem</alpha>
+  </element>
+  <element>
+    <id>2</id>
+    <label>Lorem ipsum</label>
+    <text>Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.</text>
+    <alpha>Ut wisi enim</alpha>
+  </element>
+</elements>

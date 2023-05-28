@@ -1,0 +1,130 @@
+name: Tests
+on:
+  push:
+    branches: [ 3.0.x ]
+  pull_request:
+    branches: [ 3.0.x ]
+jobs:
+  drupal:
+    name: Drupal ${{ matrix.drupal-core }} (PHP ${{ matrix.php-versions }})
+    runs-on: ubuntu-20.04
+    env:
+      extensions: mbstring, xml, pdo_sqlite, gd, opcache
+    strategy:
+      fail-fast: false
+      matrix:
+        php-versions: ['7.3', '7.4', '8.0', '8.1']
+        drupal-core: ['9.5.x']
+        phpstan: ['0']
+        drush: ['^10']
+        include:
+          # Extra run to also test on Drupal 10.
+          - php-versions: '8.1'
+            drupal-core: '10.0.x'
+            phpstan: '0'
+            drush: '^11'
+          - php-versions: '8.2'
+            drupal-core: '10.0.x'
+            phpstan: '1'
+            drush: '^12'
+    steps:
+      - run: echo "${{ env.extensions }}"
+      - name: Checkout Drupal core
+        uses: actions/checkout@v3
+        with:
+          repository: drupal/drupal
+          ref: ${{ matrix.drupal-core }}
+
+      - name: Setup PHP extension cache
+        id: extcache
+        uses: shivammathur/cache-extensions@v1
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: ${{ env.extensions }}
+          # Ideally this would be based on env.extensions, how can we make a
+          # hash out of that?
+          key: cache-v1
+
+      - name: Cache PHP extensions
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.extcache.outputs.dir }}
+          key: ${{ steps.extcache.outputs.key }}
+          restore-keys: ${{ steps.extcache.outputs.key }}
+
+      - name: Setup PHP, with composer and extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          # Disable Xdebug for better performance.
+          coverage: none
+          extensions: ${{ env.extensions }}
+          ini-values: opcache.enable_cli=1
+
+      - name: Get composer cache directory
+        id: composercache
+        run: |
+          composer config allow-plugins true -n
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          # Use composer.json for key, if composer.lock is not committed.
+          # key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Drupal core dependencies
+        run: |
+          composer install --no-progress --prefer-dist --optimize-autoloader
+          composer --no-interaction run-script drupal-phpunit-upgrade
+          composer config --no-plugins allow-plugins.phpstan/extension-installer true
+
+      - name: Install dependencies
+        run: |
+          composer config allow-plugins true -n
+          composer --no-interaction --no-progress require \
+          phpstan/phpstan:^1.7.14 \
+          mglaman/phpstan-drupal:^1.1.2 \
+          phpstan/phpstan-deprecation-rules:^1.0.0 \
+          jangregor/phpstan-prophecy:^1.0.0 \
+          phpstan/phpstan-phpunit:^1.0.0 \
+          phpstan/extension-installer:^1.0 \
+          drush/drush:${{ matrix.drush }}
+
+      # We install Coder separately because updating did not work in the local
+      # Drupal vendor dir.
+      - name: Install Coder
+        run: |
+          mkdir -p coder
+          cd coder
+          composer init --name=coder/coder --no-interaction
+          composer config allow-plugins true -n
+          composer require drupal/coder:8.3.15 --no-interaction --no-progress
+
+      # There are issues with act to include checkout inside checkout.
+      - name: Sets composer github token
+        run: |
+          composer config -g github-oauth.github.com ${{ github.token }}
+
+      - name: Install feeds_ex_xml_mapping module
+        run: |
+          composer config repositories.feeds_ex_xml_mapping vcs https://github.com/akhomy/feeds_ex_xml_mapping
+          composer require drupal/feeds_ex_xml_mapping:3.0.x-dev
+
+      - name: Run PHPUnit
+        run: |
+          php -S localhost:8888 >& /dev/null &
+          vendor/bin/drush si minimal --db-url=sqlite://sites/default/files/db.sqlite --yes
+          cp modules/contrib/feeds_ex_xml_mapping/phpunit.xml.dist core/phpunit.xml
+          ./vendor/bin/phpunit --configuration core/phpunit.xml modules/contrib/feeds_ex_xml_mapping
+
+      - name: Run PHPStan
+        run: |
+          if [[ ${{ matrix.phpstan }} == "1" ]]; then rm vendor/mglaman/phpstan-drupal/stubs/Drupal/Core/Field/FieldItemList.stub && cd modules/contrib/feeds_ex_xml_mapping && ../../../vendor/bin/phpstan analyse; fi
+
+      - name: Run PHPCS
+        run: |
+          ./coder/vendor/bin/phpcs --standard=Drupal,DrupalPractice -p modules/contrib/feeds_ex_xml_mapping

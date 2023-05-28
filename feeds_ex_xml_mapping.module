@@ -1,0 +1,84 @@
+<?php
+
+/**
+ * @file
+ * Contains generic module alters, hooks, functions.
+ */
+
+declare(strict_types = 1);
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\feeds_ex_xml_mapping\Feeds\Parser\Form\XmlParserFeedForm;
+
+/**
+ * Implements hook_feeds_parser_plugins_alter().
+ */
+function feeds_ex_xml_mapping_feeds_parser_plugins_alter(array &$plugins): void {
+  // Changes 'xml' plugin form class.
+  if (isset($plugins['xml'])) {
+    $plugins['xml']['form']['feed'] = XmlParserFeedForm::class;
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Injects XML mapping configuration in the feed type form.
+ */
+function feeds_ex_xml_mapping_form_feeds_mapping_form_alter(array &$form, FormStateInterface $form_state): void {
+  /** @var \Drupal\feeds\Entity\FeedType|null $feed_type */
+  $feed_type = \Drupal::request()->get('feeds_feed_type');
+  if (!$feed_type) {
+    return;
+  }
+  $parser_id = $feed_type->getParser()->getPluginId();
+  // Limits it only for the XML parser.
+  if ($parser_id != 'xml') {
+    return;
+  }
+  $form['override_mapping_per_feed'] = [
+    '#type' => 'details',
+    '#open' => $feed_type->getThirdPartySetting('feed_ex_xml_mapping', 'source', FALSE),
+    '#title' => t('Override mapping per feed'),
+  ];
+  $form['override_mapping_per_feed']['source'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Override source mapping'),
+    '#description' => t('Allows to override source mapping per feed'),
+    '#default_value' => $feed_type->getThirdPartySetting('feed_ex_xml_mapping', 'source', FALSE),
+  ];
+  $form['override_mapping_per_feed']['source_configuration'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Override source mapping configuration'),
+    '#description' => t('Allows to override source mapping configuration per feed'),
+    '#default_value' => $feed_type->getThirdPartySetting('feed_ex_xml_mapping', 'source_configuration', FALSE),
+    '#states' => [
+      'visible' => [
+        ':input[name="override_mapping_per_feed[source]"]' => ['checked' => TRUE],
+      ],
+    ],
+  ];
+  // Custom submit handler.
+  $form['#submit'][] = 'feeds_ex_xml_mapping_form_feeds_mapping_form_submit';
+}
+
+/**
+ * Submit function for feeds_mapping_form form to mapping override settings.
+ *
+ * @see feeds_ex_xml_mapping_form_feeds_mapping_form_alter()
+ */
+function feeds_ex_xml_mapping_form_feeds_mapping_form_submit(array &$form, FormStateInterface $form_state): void {
+  /** @var \Drupal\feeds\Entity\FeedType $feed_type */
+  $feed_type = \Drupal::request()->get('feeds_feed_type');
+  $feed_type->setThirdPartySetting('feed_ex_xml_mapping', 'source', $form_state->getValue([
+    'override_mapping_per_feed',
+    'source',
+  ],
+  FALSE));
+  $feed_type->setThirdPartySetting('feed_ex_xml_mapping', 'source_configuration', $form_state->getValue([
+    'override_mapping_per_feed',
+    'source_configuration',
+  ],
+  FALSE));
+  $feed_type->save();
+}

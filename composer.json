@@ -1,0 +1,22 @@
+{
+    "name": "drupal/feeds_ex_xml_mapping",
+    "type": "drupal-module",
+    "description": "Extends XML parser with a mapping override per feed entity.",
+    "keywords": ["feeds", "xml", "mapping"],
+    "homepage": "http://drupal.org/project/feeds_ex_xml_mapping",
+    "authors": [
+      {
+        "name": "Andriy Khomych",
+        "homepage": "https://www.drupal.org/u/andriy-khomych",
+        "role": "Maintainer"
+      }
+    ],
+    "license": "GPL-2.0+",
+    "support": {
+      "issues": "http://drupal.org/project/issues/feeds_ex_xml_mapping",
+      "source": "http://cgit.drupalcode.org/feeds_ex_xml_mapping"
+    },
+    "require": {
+      "drupal/feeds_ex": "^1.0"
+    }
+}

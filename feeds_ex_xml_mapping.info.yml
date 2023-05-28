@@ -1,0 +1,7 @@
+name: Feeds Extensible Parsers XML Mapping
+type: module
+description: Extends XML parser with a mapping override per feed entity.
+core_version_requirement: ^9 || ^10
+package: Feeds
+dependencies:
+  - feeds_ex:feeds_ex
