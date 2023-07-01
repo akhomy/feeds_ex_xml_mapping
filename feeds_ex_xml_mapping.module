@@ -59,7 +59,10 @@ function feeds_ex_xml_mapping_form_feeds_mapping_form_alter(array &$form, FormSt
     ],
   ];
   // Custom submit handler.
-  $form['#submit'][] = 'feeds_ex_xml_mapping_form_feeds_mapping_form_submit';
+  array_unshift(
+    $form['#submit'],
+    'feeds_ex_xml_mapping_form_feeds_mapping_form_submit'
+  );
 }
 
 /**
