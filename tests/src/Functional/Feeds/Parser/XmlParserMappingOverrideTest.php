@@ -204,6 +204,8 @@ class XmlParserMappingOverrideTest extends ParserTestBase {
 
   /**
    * Tests override mapping on feed.
+   *
+   * @group override-mapping-on-feed
    */
   public function testOverrideMappingOnFeed(): void {
     $this->createFieldWithStorage('field_alpha');

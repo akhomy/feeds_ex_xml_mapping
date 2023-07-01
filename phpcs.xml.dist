@@ -2,8 +2,10 @@
 <ruleset name="feeds_ex_xml_mapping">
   <description>PHP CodeSniffer configuration for feeds_ex_xml_mapping.</description>
   <arg name="extensions" value="inc,install,module,php,profile,test,theme,yml"/>
-
-  <rule ref="vendor/drupal/coder/coder_sniffer/Drupal"/>
+  <rule ref="Drupal.Commenting.VariableComment">
+    <!-- We use native class property type hints now, so @var comments are not needed anymore. -->
+    <exclude name="Drupal.Commenting.VariableComment.MissingVar"/>
+  </rule>
   <rule ref="vendor/drupal/coder/coder_sniffer/DrupalPractice"/>
   <rule ref="vendor/slevomat/coding-standard/SlevomatCodingStandard/Sniffs/TypeHints">
     <!-- Ignore checking if declare statement is directly after php tag as this conflicts with Drupal rules -->

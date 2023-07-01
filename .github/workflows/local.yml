@@ -1,4 +1,4 @@
-name: Tests
+name: Act tests
 on:
   push:
     branches: [ 1.0.x ]
@@ -7,26 +7,16 @@ on:
 jobs:
   drupal:
     name: Drupal ${{ matrix.drupal-core }} (PHP ${{ matrix.php-versions }})
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-shivammathur-20.04
     env:
       extensions: mbstring, xml, pdo_sqlite, gd, opcache
     strategy:
       fail-fast: false
       matrix:
-        php-versions: ['8.0', '8.1']
+        php-versions: ['8.0']
         drupal-core: ['9.5.x']
         phpstan: ['0']
         drush: ['^10']
-        include:
-          # Extra run to also test on Drupal 10.
-          - php-versions: '8.1'
-            drupal-core: '10.0.x'
-            phpstan: '0'
-            drush: '^11'
-          - php-versions: '8.2'
-            drupal-core: '10.0.x'
-            phpstan: '1'
-            drush: '^12'
     steps:
       - run: echo "${{ env.extensions }}"
       - name: Checkout Drupal core
@@ -35,28 +25,10 @@ jobs:
           repository: drupal/drupal
           ref: ${{ matrix.drupal-core }}
 
-      - name: Setup PHP extension cache
-        id: extcache
-        uses: shivammathur/cache-extensions@v1
-        with:
-          php-version: ${{ matrix.php-versions }}
-          extensions: ${{ env.extensions }}
-          # Ideally this would be based on env.extensions, how can we make a
-          # hash out of that?
-          key: cache-v1
-
-      - name: Cache PHP extensions
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.extcache.outputs.dir }}
-          key: ${{ steps.extcache.outputs.key }}
-          restore-keys: ${{ steps.extcache.outputs.key }}
-
       - name: Setup PHP, with composer and extensions
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          # Disable Xdebug for better performance.
           coverage: none
           extensions: ${{ env.extensions }}
           ini-values: opcache.enable_cli=1
@@ -101,7 +73,7 @@ jobs:
           mkdir -p coder
           cd coder
           composer init --name=coder/coder --no-interaction
-          composer config allow-plugins true -n
+          echo '{"config": {"allow-plugins": {"dealerdirect/phpcodesniffer-composer-installer": true}}}' > composer.json
           composer require drupal/coder:8.3.15 --no-interaction --no-progress
 
       # There are issues with act to include checkout inside checkout.
@@ -117,7 +89,7 @@ jobs:
       - name: Run PHPUnit
         run: |
           php -S localhost:8888 >& /dev/null &
-          vendor/bin/drush si minimal --db-url=sqlite://sites/default/files/db.sqlite --yes
+          ./vendor/bin/drush si minimal --db-url=sqlite://sites/default/files/db.sqlite --yes
           cp modules/contrib/feeds_ex_xml_mapping/phpunit.xml.dist core/phpunit.xml
           SIMPLETEST_BASE_URL=http://localhost:8888 ./vendor/bin/phpunit --configuration core/phpunit.xml --exclude override-mapping-on-feed modules/contrib/feeds_ex_xml_mapping
 
