@@ -40,6 +40,7 @@ function feeds_ex_xml_mapping_form_feeds_mapping_form_alter(array &$form, FormSt
     '#type' => 'details',
     '#open' => $feed_type->getThirdPartySetting('feed_ex_xml_mapping', 'source', FALSE),
     '#title' => t('Override mapping per feed'),
+    '#description' => t('Update it after saving related mappings.')
   ];
   $form['override_mapping_per_feed']['source'] = [
     '#type' => 'checkbox',
