@@ -73,7 +73,7 @@ class XmlParserMappingOverrideTest extends ParserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testMapping() {
+  public function testMapping(): void {
     $expected_sources = [
       'name' => [
         'label' => 'Name',
