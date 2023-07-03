@@ -183,7 +183,7 @@ class XmlParserMappingOverrideTest extends ParserTestBase {
         ],
       ],
     ]);
-    $feed_type->setThirdPartySetting(XmlParserFeedForm::MODULE_NAME 'source', TRUE);
+    $feed_type->setThirdPartySetting(XmlParserFeedForm::MODULE_NAME, 'source', TRUE);
     $feed_type->setThirdPartySetting(XmlParserFeedForm::MODULE_NAME, 'source_configuration', TRUE);
     $feed_type->save();
 
