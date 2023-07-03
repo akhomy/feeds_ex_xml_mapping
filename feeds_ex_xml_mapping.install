@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the feeds_ex_xml_mapping module.
+ */
+
+declare(strict_types = 1);
+
+use Drupal\feeds_ex_xml_mapping\Feeds\Parser\Form\XmlParserFeedForm;
+
+/**
+ * Unsets incorrect module settings.
+ */
+function feeds_ex_xml_mapping_update_9501(): void {
+  /** @var \Drupal\feeds\Entity\FeedType[] $feedTypes */
+  $feedTypes = \Drupal::entityTypeManager()->getStorage('feeds_feed_type')->loadMultiple();
+  foreach ($feedTypes as $feedType) {
+    if ($feedType->getThirdPartySetting('feed_ex_xml_mapping', 'source')) {
+      $feedType->unsetThirdPartySetting('feed_ex_xml_mapping', 'source');
+      $feedType->setThirdPartySetting(XmlParserFeedForm::MODULE_NAME, 'source', TRUE);
+    }
+    if ($feedType->getThirdPartySetting('feed_ex_xml_mapping', 'source_configuration')) {
+      $feedType->unsetThirdPartySetting('feed_ex_xml_mapping', 'source_configuration');
+      $feedType->setThirdPartySetting(XmlParserFeedForm::MODULE_NAME, 'source_configuration', TRUE);
+    }
+    $feedType->save();
+  }
+}
