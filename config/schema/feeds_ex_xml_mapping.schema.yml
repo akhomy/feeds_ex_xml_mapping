@@ -1,5 +1,5 @@
 # feeds_ex_xml_mapping configuration.
-feeds.feed_type.*.third_party.feed_ex_xml_mapping:
+feeds.feed_type.*.third_party.feeds_ex_xml_mapping:
   type: mapping
   label: 'Override mapping per feed'
   mapping:

@@ -20,6 +20,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class XmlParserFeedForm extends ExternalPluginFormBase implements ContainerInjectionInterface {
 
+
+  /**
+   * The module name used in the 3rd-party settings.
+   */
+  const MODULE_NAME = 'feeds_ex_xml_mapping';
+
   /**
    * The feeds target plugin manager.
    */
@@ -50,7 +56,7 @@ class XmlParserFeedForm extends ExternalPluginFormBase implements ContainerInjec
   public function buildConfigurationForm(array $form, FormStateInterface $form_state, ?FeedInterface $feed = NULL): array {
     $feed_type = $feed->getType();
     // If no configuration was enabled - skip build mappping.
-    if (empty($feed_type->getThirdPartySetting('feed_ex_xml_mapping', 'source', FALSE))) {
+    if (empty($feed_type->getThirdPartySetting(self::MODULE_NAME, 'source', FALSE))) {
       return [];
     }
     $mappings = $feed->get('config')->getValue()[0]['xml_parser'] ?? [];
@@ -76,7 +82,7 @@ class XmlParserFeedForm extends ExternalPluginFormBase implements ContainerInjec
     $headers = [
       $this->t('Source'),
     ];
-    if ($feed_type->getThirdPartySetting('feed_ex_xml_mapping', 'source_configuration', FALSE)) {
+    if ($feed_type->getThirdPartySetting(self::MODULE_NAME, 'source_configuration', FALSE)) {
       $headers = [
         $this->t('Source'),
         $this->t('Configure'),
@@ -169,7 +175,7 @@ class XmlParserFeedForm extends ExternalPluginFormBase implements ContainerInjec
           ];
         }
         // Settings subform for particular target. Only one per field.
-        if ($index == 0 && $feed_type->getThirdPartySetting('feed_ex_xml_mapping', 'source_configuration', FALSE)) {
+        if ($index == 0 && $feed_type->getThirdPartySetting(self::MODULE_NAME, 'source_configuration', FALSE)) {
           $target_plugin_id = $target->getPluginId();
           $target_config = $field_settings['settings'] ?? [];
           $target_config['feed_type'] = $feed_type;
@@ -206,7 +212,7 @@ class XmlParserFeedForm extends ExternalPluginFormBase implements ContainerInjec
           $row['settings']['#attributes'] = ['rowspan' => count($properties)];
         }
         // Unique property.
-        if ($target->isUnique($property) && $feed_type->getThirdPartySetting('feed_ex_xml_mapping', 'source_configuration', FALSE)) {
+        if ($target->isUnique($property) && $feed_type->getThirdPartySetting(self::MODULE_NAME, 'source_configuration', FALSE)) {
           $row['unique'][$property] = [
             '#title' => $this->t('Unique'),
             '#type' => 'checkbox',

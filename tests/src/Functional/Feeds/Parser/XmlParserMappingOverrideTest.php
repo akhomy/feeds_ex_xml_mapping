@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Drupal\Tests\feeds_ex_xml_mapping\Functional\Feeds\Parser;
 
 use Drupal\Component\Utility\Xss;
+use Drupal\feeds_ex_xml_mapping\Feeds\Parser\Form\XmlParserFeedForm;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\feeds_ex\Functional\Feeds\Parser\ContextTestTrait;
 use Drupal\Tests\feeds_ex\Functional\Feeds\Parser\ParserTestBase;
@@ -138,8 +139,8 @@ class XmlParserMappingOverrideTest extends ParserTestBase {
     // Now check the parser configuration.
     /** @var \Drupal\feeds\Entity\FeedType $feed_type */
     $feed_type = $this->reloadEntity($this->feedType);
-    $this->assertTrue($feed_type->getThirdPartySetting('feed_ex_xml_mapping', 'source'), 'Override mapping per feed source is enabled');
-    $this->assertTrue($feed_type->getThirdPartySetting('feed_ex_xml_mapping', 'source_configuration'), 'Override mapping per feed source configuration is enabled');
+    $this->assertTrue($feed_type->getThirdPartySetting(XmlParserFeedForm::MODULE_NAME, 'source'), 'Override mapping per feed source is enabled');
+    $this->assertTrue($feed_type->getThirdPartySetting(XmlParserFeedForm::MODULE_NAME, 'source_configuration'), 'Override mapping per feed source configuration is enabled');
   }
 
   /**
@@ -182,8 +183,8 @@ class XmlParserMappingOverrideTest extends ParserTestBase {
         ],
       ],
     ]);
-    $feed_type->setThirdPartySetting('feed_ex_xml_mapping', 'source', TRUE);
-    $feed_type->setThirdPartySetting('feed_ex_xml_mapping', 'source_configuration', TRUE);
+    $feed_type->setThirdPartySetting(XmlParserFeedForm::MODULE_NAME 'source', TRUE);
+    $feed_type->setThirdPartySetting(XmlParserFeedForm::MODULE_NAME, 'source_configuration', TRUE);
     $feed_type->save();
 
     // Checks form elements.
@@ -262,8 +263,8 @@ class XmlParserMappingOverrideTest extends ParserTestBase {
         ],
       ],
     ]);
-    $feed_type->setThirdPartySetting('feed_ex_xml_mapping', 'source', TRUE);
-    $feed_type->setThirdPartySetting('feed_ex_xml_mapping', 'source_configuration', TRUE);
+    $feed_type->setThirdPartySetting(XmlParserFeedForm::MODULE_NAME, 'source', TRUE);
+    $feed_type->setThirdPartySetting(XmlParserFeedForm::MODULE_NAME, 'source_configuration', TRUE);
     $feed_type->save();
 
     // Import XML file.
