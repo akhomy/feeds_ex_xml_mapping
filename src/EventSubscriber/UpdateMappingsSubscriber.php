@@ -39,7 +39,7 @@ class UpdateMappingsSubscriber implements EventSubscriberInterface {
     $parser_id = $feed_type->getParser()->getPluginId();
     if ($parser_id == 'xml') {
       // Get mappings saved in feed.
-      $mappings = $feed->get('config')->getValue()[0]['xml_parser'];
+      $mappings = $feed->get('config')->getValue()[0]['xml_parser'] ?? [];
       if (empty($mappings)) {
         return;
       }
