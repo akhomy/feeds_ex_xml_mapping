@@ -26,9 +26,10 @@ class XmlMappingHelper {
   public static function getMappingsFromFeedType(FeedTypeInterface $feed_type): array {
     $parser_configuration = $feed_type->getParser()->getConfiguration();
 
-    $mappings = $sources = [];
+    $mappings = $sources = $custom_sources = [];
     $feed_type_mappings = $feed_type->getMappings();
     $feed_type_sources = $parser_configuration['sources'] ?? [];
+    $feed_type_custom_sources = $feed_type->get('custom_sources') ?? [];
     foreach ($feed_type_mappings as $feed_type_mapping) {
       $mapping = $feed_type_mapping;
       // Adjust xpath field mappings.
@@ -39,13 +40,18 @@ class XmlMappingHelper {
           $mapping['map'][$field_name] = $xpath_plugin_id;
           $sources[$xpath_plugin_id]['value'] = $feed_type_sources[$source]['value'];
         }
+        if (isset($feed_type_custom_sources[$source])) {
+          $xpath_plugin_id = 'xpath_' . $mapping['target'] . '_' . $field_name;
+          $mapping['map'][$field_name] = $xpath_plugin_id;
+          $custom_sources[$xpath_plugin_id]['value'] = $feed_type_custom_sources[$source]['value'];
+        }
       }
       $mappings[] = $mapping;
     }
     return [
       'context' => $parser_configuration['context']['value'],
       'mappings' => $mappings,
-      'sources' => $sources,
+      'custom_sources' => $custom_sources,
     ];
   }
 

@@ -149,7 +149,7 @@ class XmlParserFeedForm extends ExternalPluginFormBase implements ContainerInjec
             ],
             '#array_parents' => ['mappings', $field_name, 'xpath', $property],
             '#description' => $this->t('The XPath query to run.'),
-            '#default_value' => $mappings['sources']['xpath_' . $field_name . '_' . $property]['value'] ?? '',
+            '#default_value' => $mappings['custom_sources']['xpath_' . $field_name . '_' . $property]['value'] ?? '',
           ];
           // Add map key to satisfy validation in parser base.
           $row['map'][$property] = [
@@ -307,7 +307,6 @@ class XmlParserFeedForm extends ExternalPluginFormBase implements ContainerInjec
     $config[0]['xml_parser'] = [
       'context' => $values['context'],
       'mappings' => $mappings,
-      'sources' => $sources,
       'custom_sources' => $custom_sources,
     ];
     $feed->get('config')->setValue($config);

@@ -47,12 +47,16 @@ class UpdateMappingsSubscriber implements EventSubscriberInterface {
       $feed_type->setMappings($mappings['mappings']);
       // Update custom sources.
       $feed_type->set('custom_sources', $mappings['custom_sources']);
-      // Update sources.
-      $feed_type->set('sources', $mappings['sources']);
       // Update parser configuration.
       $parser_configuration = $feed_type->get('parser_configuration');
       $parser_configuration['context']['value'] = $mappings['context'];
-      $parser_configuration['sources'] = $mappings['sources'];
+      // Left-over to support older versions.
+      // @see https://www.drupal.org/project/feeds_ex/issues/3209655
+      if (!empty($mappings['sources'])) {
+        // Update sources.
+        $feed_type->set('sources', $mappings['sources']);
+        $parser_configuration['sources'] = $mappings['sources'];
+      }
       $feed_type->set('parser_configuration', $parser_configuration);
     }
   }
