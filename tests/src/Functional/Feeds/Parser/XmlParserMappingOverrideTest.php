@@ -301,24 +301,6 @@ class XmlParserMappingOverrideTest extends ParserTestBase {
           ],
         ],
       ],
-      'sources' => [
-        'xpath_field_alpha_value' => [
-          'label' => 'field_alpha:value',
-          'value' => 'alpha',
-        ],
-        'xpath_nid_value' => [
-          'label' => 'nid:value',
-          'value' => 'id',
-        ],
-        'xpath_feeds_item_guid' => [
-          'label' => 'feeds_item:guid',
-          'value' => 'id',
-        ],
-        'xpath_title_value' => [
-          'label' => 'title:value',
-          'value' => 'label',
-        ],
-      ],
       'custom_sources' => [
         'xpath_field_alpha_value' => [
           'label' => 'field_alpha:value',
